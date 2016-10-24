@@ -3,12 +3,20 @@
 #include "targetver.h"
 
 #include <stdio.h>
-//#include <tchar.h>
 
 #define WIN32_LEAN_AND_MEAN
 #define VC_EXTRALEAN            // 从 Windows 头中排除极少使用的资料
 
 #include <afx.h>
 #include <afxwin.h>
+#include <afxwin.h>         // MFC core and standard components
 #include <gdiplus.h>
 #include <iostream>
+#include <fstream>
+
+//MS has defined two macros in windows.h, causing the function in STL with the same names not to work.
+#undef min
+#undef max
+
+#include "json/json.h"
+#include "json/json-forwards.h"
