@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "AutoSnapshot.h"
+#include "IniFile.h"
 
-using namespace Gdiplus;
 #pragma comment(lib, "gdiplus.lib")
 
 int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
@@ -9,15 +9,15 @@ int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
 	UINT num = 0;          // number of image encoders
 	UINT size = 0;         // size of the image encoder array in bytes
 
-	ImageCodecInfo* pImageCodecInfo = NULL;
+	Gdiplus::ImageCodecInfo* pImageCodecInfo = NULL;
 
-	GetImageEncodersSize(&num, &size);
+	Gdiplus::GetImageEncodersSize(&num, &size);
 	if (size == 0)
 	{
 		return -1;  // Failure
 	}
 
-	pImageCodecInfo = (ImageCodecInfo*)(malloc(size));
+	pImageCodecInfo = (Gdiplus::ImageCodecInfo*)(malloc(size));
 	if (pImageCodecInfo == NULL)
 	{
 		return -1;  // Failure
@@ -41,14 +41,14 @@ int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
 
 void BitmapToJpg(HBITMAP hbmpImage, int width, int height, LPCWSTR filename, ULONG uQuality)
 {
-	Bitmap *p_bmp = Bitmap::FromHBITMAP(hbmpImage, NULL);
+	Gdiplus::Bitmap *p_bmp = Gdiplus::Bitmap::FromHBITMAP(hbmpImage, NULL);
 
 	CLSID pngClsid;
-	EncoderParameters encoderParams;
+	Gdiplus::EncoderParameters encoderParams;
 	encoderParams.Count = 1;
 	encoderParams.Parameter[0].NumberOfValues = 1;
-	encoderParams.Parameter[0].Guid = EncoderQuality;
-	encoderParams.Parameter[0].Type = EncoderParameterValueTypeLong;
+	encoderParams.Parameter[0].Guid = Gdiplus::EncoderQuality;
+	encoderParams.Parameter[0].Type = Gdiplus::EncoderParameterValueTypeLong;
 	encoderParams.Parameter[0].Value = &uQuality;
 	int result = GetEncoderClsid(L"image/jpeg", &pngClsid);
 	if (result != -1)
@@ -82,37 +82,54 @@ void getDirectoryPath(CString &strCurPath) {
 void getNowTime(char *buffer) {
 	SYSTEMTIME sys;
 	GetLocalTime(&sys);
-	sprintf_s(buffer, 24, "%4d-%02d-%02d-%02d-%02d-%02d.jpg",
+	sprintf_s(buffer, 20, "%4d-%02d-%02d-%02d-%02d-%02d",
 				sys.wYear, sys.wMonth, sys.wDay, sys.wHour, sys.wMinute, sys.wSecond);
 }
 
 //TODO add a global hotkey to call this function
-void timerWork()
+void timerWork(CString filename)
 {
-	CString filename;
-	getDirectoryPath(filename);
-	char *time = new char[24];
+	char *time = new char[20];
 	getNowTime(time);
 	filename += time;
+	filename += ".dump";
 	//TODO obscure the file name and directory path
 
 	int width = GetSystemMetrics(SM_CXSCREEN);
 	int height = GetSystemMetrics(SM_CYSCREEN);
 
-	std::wcout << filename.GetString() << std::endl;
+	std::cout << filename.GetString() << std::endl;
 	ScreenCapture(0, 0, width, height, filename.GetString(), 100L);
+	
+	delete time;
 }
 
 int _real_main() {
-	GdiplusStartupInput gdiplusStartupInput;
+	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 	ULONG_PTR gdiplusToken;
-	GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+	Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+
+	CString filename;
+	getDirectoryPath(filename);
+
+	CString configPath = filename + "snap_config.ini";
+	CFileFind finder;   //will create a new one if not exists
+	BOOL ifFind = finder.FindFile(configPath.GetString());
+	if (!ifFind)
+	{
+		//TODO require user to do configuration
+	}
+	
+
+	CIniFile iniFile(configPath.GetString(), 4096);
+
 	while (true) {
-		timerWork();
+		timerWork(filename);
 		Sleep(5000);
 		//TODO make the time duration adjustable
 	}
-	GdiplusShutdown(gdiplusToken);
+
+	Gdiplus::GdiplusShutdown(gdiplusToken);
 	return 0;
 }
 
