@@ -8,8 +8,8 @@
 #define VC_EXTRALEAN            // 从 Windows 头中排除极少使用的资料
 
 #include <afx.h>
-#include <afxwin.h>
 #include <afxwin.h>         // MFC core and standard components
+#include <afxdialogex.h>
 #include <gdiplus.h>
 #include <iostream>
 #include <fstream>

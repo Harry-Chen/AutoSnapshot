@@ -152,6 +152,7 @@
     <ClInclude Include="AutoSnapshot.h" />
     <ClInclude Include="Configuration.h" />
     <ClInclude Include="ConfigurationWindow.h" />
+    <ClInclude Include="HiddenWindow.h" />
     <ClInclude Include="json\json-forwards.h" />
     <ClInclude Include="json\json.h" />
     <ClInclude Include="Utilities.h" />
@@ -169,6 +170,7 @@
     <ClCompile Include="ConfigurationWindow.cpp">
       <FileType>CppForm</FileType>
     </ClCompile>
+    <ClCompile Include="HiddenWindow.cpp" />
     <ClCompile Include="jsoncpp.cpp" />
     <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -180,6 +182,9 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="AutoSnapshot.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

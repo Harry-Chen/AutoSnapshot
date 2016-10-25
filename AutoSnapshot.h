@@ -10,7 +10,7 @@ class ConfigurationWindow;
 class AutoSnapshot :public CWinApp
 {
 private:
-	ConfigurationWindow *wnd;
+	ConfigurationWindow *configWindow;
 	ULONG_PTR gdiplusToken;
 	CString directoryPath;
 public:

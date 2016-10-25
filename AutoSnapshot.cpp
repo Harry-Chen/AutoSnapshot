@@ -3,48 +3,40 @@
 #include "AutoSnapshot.h"
 #include "ConfigurationWindow.h"
 #include "Utilities.h"
+#include "HiddenWindow.h"
 
+Configuration config;
 
 BOOL AutoSnapshot::InitInstance()
 {
-	wnd = new ConfigurationWindow(this);
-
-	m_pMainWnd = wnd;
+	configWindow = new ConfigurationWindow(this, &config);
+	m_pMainWnd = new HiddenWindow(this);
 
 	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 	Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
 	getDirectoryPath(directoryPath);
 
-	Configuration config;
+
 	CString configPath = directoryPath + "snap_config.json";
 	CFileFind finder;
 	BOOL ifFind = finder.FindFile(configPath.GetString());
-
-	//Enable the triggers for debugging
-	SetTimer(*m_pMainWnd, TIMER_ID, 5000L, NULL);
-	RegisterHotKey(*m_pMainWnd, HOTKEY_ID, MOD_ALT | MOD_SHIFT, 'X');
+	CStringA configPathAnsi(configPath);
+	const char* pathForJson = configPathAnsi.GetString();
 
 	if (!ifFind)
 	{
-		//TODO require user to do configuration
-
-	}
-	else {
-		bool result = config.parseFromFile((const char*)configPath.GetString());
-		if (!result) {
-			//TODO corrput configuration, require user to do configuration
-		}
-		if (config.isTimerEnabled()) {
-			SetTimer(*m_pMainWnd, TIMER_ID, config.getTimerInterval(), NULL);
-
-		}
-		if (config.isHotKeyEnabled()) {
-			RegisterHotKey(*m_pMainWnd, HOTKEY_ID, config.getHotKeyModifiers(), config.getHotKeyCode());
-		}
+		configWindow->initalizeConfiguration(pathForJson);
 	}
 
-	m_pMainWnd->ShowWindow(SW_SHOW);
+	bool result = config.parseFromFile(pathForJson);
+	if (config.isTimerEnabled()) {
+		SetTimer(*m_pMainWnd, TIMER_ID, config.getTimerInterval(), NULL);
+
+	}
+	if (config.isHotKeyEnabled()) {
+		RegisterHotKey(*m_pMainWnd, HOTKEY_ID, config.getHotKeyModifiers(), config.getHotKeyCode());
+	}
 	return TRUE;
 
 }
@@ -55,7 +47,7 @@ int AutoSnapshot::ExitInstance() {
 }
 
 void AutoSnapshot::doWork() {
-	work(directoryPath);
+	work(directoryPath, config.isEncryptionEnabled());
 }
 
 AutoSnapshot theApp;

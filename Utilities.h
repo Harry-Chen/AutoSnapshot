@@ -11,6 +11,7 @@ void getNowTime(char *buffer);
 
 bool ScreenCapture(int x, int y, int width, int height, LPCWSTR filename, ULONG uQuality);
 
-void removeJpegHeader(const char* filename);
+void fillJpegHeaderWithZero(LPCTSTR filename);
 
-void work(CString filename);
+void work(CString filename, bool encryption);
+
