@@ -15,3 +15,5 @@ void fillJpegHeaderWithZero(LPCTSTR filename);
 
 void work(CString filename, bool encryption);
 
+void hideFile(LPCWSTR filename);
+

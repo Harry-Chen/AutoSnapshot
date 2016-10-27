@@ -7,8 +7,9 @@ const char* HOTKEY_ENABLED = "hotkey_enabled";
 const char* HOTKEY_MODIFIERS = "hotkey_modifiers";
 const char* HOTKEY_CODE = "hotkey_code";
 const char* ENCRYPTION_ENABLED = "encryption_enabled";
+const char* RANDOM_DIRECTORY = "random_directory";
 
-const char *KEYS[] = { TIMER_ENABLED, TIMER_INTERVAL, HOTKEY_ENABLED, HOTKEY_MODIFIERS, HOTKEY_CODE, ENCRYPTION_ENABLED };
+const char *KEYS[] = { TIMER_ENABLED, TIMER_INTERVAL, HOTKEY_ENABLED, HOTKEY_MODIFIERS, HOTKEY_CODE, ENCRYPTION_ENABLED, RANDOM_DIRECTORY };
 
 Configuration::Configuration() {
 	root = new Json::Value();
@@ -31,6 +32,7 @@ bool Configuration::parseFromFile(const char * filePath) {
 		hotkey_modifiers = root->get(HOTKEY_MODIFIERS, MOD_ALT | MOD_SHIFT).asInt();
 		hotkey_code = root->get(HOTKEY_CODE, 'X').asInt();
 		encryption_enabled = root->get(ENCRYPTION_ENABLED, false).asBool();
+		random_directory = root->get(RANDOM_DIRECTORY, std::string("")).asString();
 		return true;
 	}
 	else return false;
@@ -44,7 +46,7 @@ void Configuration::writeIntoFile(const char * filePath) {
 	delete temp;
 }
 
-void Configuration::setValues(bool _timer_enabled, UINT _timer_interval, bool _hotkey_enabled, UINT _hotkey_hotkey_modifiers, UINT _hotkey_code, bool _encryption_enabled){
+void Configuration::setValues(bool _timer_enabled, UINT _timer_interval, bool _hotkey_enabled, UINT _hotkey_hotkey_modifiers, UINT _hotkey_code, bool _encryption_enabled, std::string _random_directory){
 	temp = new Json::Value();
 	(*temp)[TIMER_ENABLED] = _timer_enabled;
 	(*temp)[TIMER_INTERVAL] = _timer_interval;
@@ -52,6 +54,7 @@ void Configuration::setValues(bool _timer_enabled, UINT _timer_interval, bool _h
 	(*temp)[HOTKEY_MODIFIERS] = _hotkey_hotkey_modifiers;
 	(*temp)[HOTKEY_CODE] = _hotkey_code;
 	(*temp)[ENCRYPTION_ENABLED] = _encryption_enabled;
+	(*temp)[RANDOM_DIRECTORY] = _random_directory;
 }
 
 bool Configuration::isTimerEnabled()
@@ -81,4 +84,8 @@ UINT Configuration::getHotKeyCode()
 
 bool Configuration::isEncryptionEnabled() {
 	return encryption_enabled;
+}
+
+std::string Configuration::getRandomDirectory() {
+	return random_directory;
 }

@@ -6,40 +6,47 @@
 #include "HiddenWindow.h"
 
 Configuration config;
+CFileFind finder;
 
 BOOL AutoSnapshot::InitInstance()
 {
 	configWindow = new ConfigurationWindow(this, &config);
 	m_pMainWnd = new HiddenWindow(this);
 
+	//Use Ctrl+Alt+Shift+X to exit
+	//TODO not working
+	RegisterHotKey(*m_pMainWnd, HOTKEY_EXIT, MOD_ALT | MOD_SHIFT, 'z');
+
 	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 	Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
 	getDirectoryPath(directoryPath);
 
-
 	CString configPath = directoryPath + "snap_config.json";
-	CFileFind finder;
-	BOOL ifFind = finder.FindFile(configPath.GetString());
 	CStringA configPathAnsi(configPath);
 	const char* pathForJson = configPathAnsi.GetString();
 
-	if (!ifFind)
+	if (!finder.FindFile(configPath.GetString()))
 	{
 		configWindow->initalizeConfiguration(pathForJson);
 	}
 
 	bool result = config.parseFromFile(pathForJson);
+
+	if (config.isEncryptionEnabled()) {
+		hideFile(configPath.GetString());
+		directoryPath += config.getRandomDirectory().c_str();
+	}
+	
 	if (config.isTimerEnabled()) {
 		SetTimer(*m_pMainWnd, TIMER_ID, config.getTimerInterval(), NULL);
 
 	}
+
 	if (config.isHotKeyEnabled()) {
 		RegisterHotKey(*m_pMainWnd, HOTKEY_TRIGGER, config.getHotKeyModifiers(), config.getHotKeyCode());
 	}
-	//Use Ctrl+Alt+Shift+X to exit
-	//TODO not working
-	RegisterHotKey(*m_pMainWnd, HOTKEY_EXIT, MOD_ALT|MOD_SHIFT, 'z');
+
 	return TRUE;
 
 }
@@ -57,6 +64,15 @@ int AutoSnapshot::ExitInstance() {
 }
 
 void AutoSnapshot::doWork() {
+	LPCWSTR path = directoryPath.GetString();
+	if (!finder.FindFile(path)) {
+		//This only happens when encryption is on
+		//Let's hide the directories level by level
+		SHCreateDirectoryEx(NULL, path, NULL);
+		hideFile(path);
+		int pos = directoryPath.GetLength() - 11;
+		hideFile(directoryPath.Left(pos).GetString());
+	}
 	work(directoryPath, config.isEncryptionEnabled());
 }
 

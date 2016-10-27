@@ -11,6 +11,7 @@
 #include <afxwin.h>         // MFC core and standard components
 #include <afxdialogex.h>
 #include <gdiplus.h>
+#include <Shlobj.h>
 #include <iostream>
 #include <fstream>
 

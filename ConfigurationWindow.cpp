@@ -77,7 +77,17 @@ void ConfigurationWindow::OnBnClickedOk()
 		MessageBox(_T("请至少使用一种触发方式"), _T("错误"));
 		return;
 	}
-	mConfig->setValues(timer_enabled, interval, hotkey_enabled, modifiers, code, encryption_enabled);
+
+	std::string prefix;
+	srand(time(NULL));
+	for (int i = 0; i < 10; ++i)
+		prefix += 'A' + (rand() % 26);
+	prefix += '\\';
+	for (int i = 0; i < 10; ++i)
+		prefix += 'A' + (rand() % 26);
+	prefix += '\\';
+
+	mConfig->setValues(timer_enabled, interval, hotkey_enabled, modifiers, code, encryption_enabled, prefix);
 	mConfig->writeIntoFile(mFilePath);
 	CStringA notice;
 	notice = "配置成功，点击“确认”开始运行\n";
