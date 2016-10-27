@@ -23,6 +23,14 @@ void HiddenWindow::OnTimer(UINT_PTR nIDEvent)
 
 void HiddenWindow::OnHotKey(UINT nHotKeyId, UINT nKey1, UINT nKey2)
 {
-	mApp->doWork();
+	switch (nHotKeyId) {
+	case HOTKEY_TRIGGER:
+		mApp->doWork();
+		break;
+	case HOTKEY_EXIT:
+		PostMessage(WM_QUIT);
+		break;
+	}
+
 	CFrameWnd::OnHotKey(nHotKeyId, nKey1, nKey2);
 }

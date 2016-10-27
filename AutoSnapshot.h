@@ -2,7 +2,8 @@
 
 #include "resource.h"
 
-#define HOTKEY_ID 0x00001
+#define HOTKEY_TRIGGER 0x00666
+#define HOTKEY_EXIT 0x00999
 #define TIMER_ID 0x00233
 
 class ConfigurationWindow;

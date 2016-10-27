@@ -35,14 +35,24 @@ BOOL AutoSnapshot::InitInstance()
 
 	}
 	if (config.isHotKeyEnabled()) {
-		RegisterHotKey(*m_pMainWnd, HOTKEY_ID, config.getHotKeyModifiers(), config.getHotKeyCode());
+		RegisterHotKey(*m_pMainWnd, HOTKEY_TRIGGER, config.getHotKeyModifiers(), config.getHotKeyCode());
 	}
+	//Use Ctrl+Alt+Shift+X to exit
+	//TODO not working
+	RegisterHotKey(*m_pMainWnd, HOTKEY_EXIT, MOD_ALT|MOD_SHIFT, 'z');
 	return TRUE;
 
 }
 
 int AutoSnapshot::ExitInstance() {
 	Gdiplus::GdiplusShutdown(gdiplusToken);
+	if (config.isTimerEnabled()) {
+		KillTimer(*m_pMainWnd, TIMER_ID);
+	}
+	if (config.isHotKeyEnabled()) {
+		UnregisterHotKey(*m_pMainWnd, HOTKEY_TRIGGER);
+	}
+	UnregisterHotKey(*m_pMainWnd, HOTKEY_EXIT);
 	return 0;
 }
 

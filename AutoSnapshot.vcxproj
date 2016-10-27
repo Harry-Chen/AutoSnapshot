@@ -162,15 +162,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AutoSnapshot.cpp">
-      <FileType>CppClass</FileType>
+      <FileType>CppCode</FileType>
     </ClCompile>
     <ClCompile Include="Configuration.cpp">
-      <FileType>CppClass</FileType>
+      <FileType>CppCode</FileType>
     </ClCompile>
     <ClCompile Include="ConfigurationWindow.cpp">
-      <FileType>CppForm</FileType>
+      <FileType>CppCode</FileType>
     </ClCompile>
-    <ClCompile Include="HiddenWindow.cpp" />
+    <ClCompile Include="HiddenWindow.cpp">
+      <FileType>CppCode</FileType>
+    </ClCompile>
     <ClCompile Include="jsoncpp.cpp" />
     <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="stdafx.cpp">

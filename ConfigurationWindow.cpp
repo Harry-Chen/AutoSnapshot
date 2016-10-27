@@ -61,7 +61,7 @@ void ConfigurationWindow::OnBnClickedOk()
 	CString str;
 	GetDlgItem(IDC_TXT_INTERVAL)->GetWindowText(str);
 	if (timer_enabled && str == "") {
-		MessageBox(_T("Interval cannot be empty!"));
+		MessageBox(_T("请输入间隔时间"), _T("错误"));
 		return;
 	}
 	if (str != "") {
@@ -70,25 +70,26 @@ void ConfigurationWindow::OnBnClickedOk()
 	}
 	((CHotKeyCtrl*)GetDlgItem(IDC_HOTKEY))->GetHotKey(code, modifiers);
 	if (hotkey_enabled && (code == 0 || modifiers == 0)) {
-		MessageBox(_T("Hot key sequence cannot be empty!"));
+		MessageBox(_T("请指定快捷键"), _T("错误"));
 		return;
 	}
 	if (!hotkey_enabled && !timer_enabled) {
-		MessageBox(_T("Please choose at least one method!"));
+		MessageBox(_T("请至少使用一种触发方式"), _T("错误"));
 		return;
 	}
 	mConfig->setValues(timer_enabled, interval, hotkey_enabled, modifiers, code, encryption_enabled);
 	mConfig->writeIntoFile(mFilePath);
 	CStringA notice;
-	notice = "Configuration created. Will start running now.\n";
-	notice += "To regenerate it, remove ";
+	notice = "配置成功，点击“确认”开始运行\n";
+	notice += "若要重新配置，请删除";
 	notice += mFilePath;
-	MessageBoxA(GetSafeHwnd(), notice.GetString(), (LPCSTR)"Notice", 0);
+	MessageBoxA(GetSafeHwnd(), notice.GetString(), (LPCSTR)"提醒", 0);
 	CDialog::OnOK();
 }
 
 void ConfigurationWindow::OnClose()
 {
-	return;
+	MessageBox(_T("配置未完成，程序将立刻退出"), _T("提醒"));
+	CDialogEx::OnClose();
 }
 

