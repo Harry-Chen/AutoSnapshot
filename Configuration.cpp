@@ -38,7 +38,7 @@ bool Configuration::parseFromFile(const char * filePath) {
 	else return false;
 }
 
-void Configuration::writeIntoFile(const char * filePath) {
+void Configuration::writeIntoFile(const char * filePath) const{
 	std::ofstream out(filePath, std::ios::binary);
 	Json::StyledStreamWriter writer;
 	writer.write(out, *temp);
@@ -57,35 +57,37 @@ void Configuration::setValues(bool _timer_enabled, UINT _timer_interval, bool _h
 	(*temp)[RANDOM_DIRECTORY] = _random_directory;
 }
 
-bool Configuration::isTimerEnabled()
+bool Configuration::isTimerEnabled() const
 {
 	return timer_enabled;
 }
 
-UINT Configuration::getTimerInterval()
+UINT Configuration::getTimerInterval() const
 {
 	return timer_interval;
 }
 
-bool Configuration::isHotKeyEnabled()
+bool Configuration::isHotKeyEnabled() const
 {
 	return hotkey_enabled;
 }
 
-UINT Configuration::getHotKeyModifiers()
+UINT Configuration::getHotKeyModifiers() const
 {
 	return hotkey_modifiers;
 }
 
-UINT Configuration::getHotKeyCode()
+UINT Configuration::getHotKeyCode() const
 {
 	return hotkey_code;
 }
 
-bool Configuration::isEncryptionEnabled() {
+bool Configuration::isEncryptionEnabled() const
+{
 	return encryption_enabled;
 }
 
-std::string Configuration::getRandomDirectory() {
+std::string Configuration::getRandomDirectory() const
+{
 	return random_directory;
 }

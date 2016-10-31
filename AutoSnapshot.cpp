@@ -10,7 +10,6 @@ CFileFind finder;
 
 BOOL AutoSnapshot::InitInstance()
 {
-	configWindow = new ConfigurationWindow(this, &config);
 	m_pMainWnd = new HiddenWindow(this);
 
 	//Use Ctrl+Alt+Shift+X to exit
@@ -24,14 +23,15 @@ BOOL AutoSnapshot::InitInstance()
 
 	CString configPath = directoryPath + "snap_config.json";
 	CStringA configPathAnsi(configPath);
-	const char* pathForJson = configPathAnsi.GetString();
+	auto pathForJson = configPathAnsi.GetString();
 
 	if (!finder.FindFile(configPath.GetString()))
 	{
-		configWindow->initalizeConfiguration(pathForJson);
+		auto configWindow = new ConfigurationWindow(&config, pathForJson);
+		configWindow->DoModal();
 	}
 
-	bool result = config.parseFromFile(pathForJson);
+	config.parseFromFile(pathForJson);
 
 	if (config.isEncryptionEnabled()) {
 		hideFile(configPath.GetString());
@@ -39,7 +39,7 @@ BOOL AutoSnapshot::InitInstance()
 	}
 	
 	if (config.isTimerEnabled()) {
-		SetTimer(*m_pMainWnd, TIMER_ID, config.getTimerInterval(), NULL);
+		SetTimer(*m_pMainWnd, TIMER_ID, config.getTimerInterval(), nullptr);
 
 	}
 
@@ -51,7 +51,7 @@ BOOL AutoSnapshot::InitInstance()
 
 }
 
-int AutoSnapshot::ExitInstance() {
+int AutoSnapshot::ExitInstance(){
 	Gdiplus::GdiplusShutdown(gdiplusToken);
 	if (config.isTimerEnabled()) {
 		KillTimer(*m_pMainWnd, TIMER_ID);
@@ -63,14 +63,14 @@ int AutoSnapshot::ExitInstance() {
 	return 0;
 }
 
-void AutoSnapshot::doWork() {
-	LPCWSTR path = directoryPath.GetString();
+void AutoSnapshot::doWork() const{
+	auto path = directoryPath.GetString();
 	if (!finder.FindFile(path)) {
 		//This only happens when encryption is on
 		//Let's hide the directories level by level
-		SHCreateDirectoryEx(NULL, path, NULL);
+		SHCreateDirectoryEx(nullptr, path, nullptr);
 		hideFile(path);
-		int pos = directoryPath.GetLength() - 11;
+		auto pos = directoryPath.GetLength() - 11;
 		hideFile(directoryPath.Left(pos).GetString());
 	}
 	work(directoryPath, config.isEncryptionEnabled());

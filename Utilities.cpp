@@ -40,7 +40,7 @@ int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
 	return -1;  // Failure
 }
 
-bool BitmapIdentical(Gdiplus::Bitmap *a, Gdiplus::Bitmap *b) {
+bool isBitmapIdentical(Gdiplus::Bitmap *a, Gdiplus::Bitmap *b) {
 	if (a->GetHeight() != b->GetHeight() || a->GetWidth() != b->GetWidth())
 		return false;
 	Gdiplus::Color ca, cb;
@@ -48,7 +48,7 @@ bool BitmapIdentical(Gdiplus::Bitmap *a, Gdiplus::Bitmap *b) {
 		for (size_t y = 0; y < a->GetHeight(); y++) {
 			a->GetPixel(x, y, &ca);
 			b->GetPixel(x, y, &cb);
-			if (ca.GetValue() != ba.GetValue())
+			if (ca.GetValue() != cb.GetValue())
 				return false;
 		}
 	}
@@ -59,7 +59,7 @@ bool BitmapToJpg(HBITMAP hbmpImage, int width, int height, LPCWSTR filename, ULO
 {
 	Gdiplus::Bitmap *p_bmp = Gdiplus::Bitmap::FromHBITMAP(hbmpImage, NULL);
 
-	if (p_prev_bmp != NULL && BitmapIdentical(p_bitmap, p_prev_bmp)) {
+	if (p_prev_bmp != NULL && isBitmapIdentical(p_bmp, p_prev_bmp)) {
 		delete p_bmp;
 		return false;
 	}
@@ -76,7 +76,7 @@ bool BitmapToJpg(HBITMAP hbmpImage, int width, int height, LPCWSTR filename, ULO
 	else
 		std::cout << "Encoder failed" << std::endl;
 	p_bmp->Save(filename, &pngClsid, &encoderParams);
-	if (p_prev_bmp != NULl)
+	if (p_prev_bmp != NULL)
 		delete p_prev_bmp;
 	p_prev_bmp = p_bmp;
 	return true;
@@ -133,7 +133,7 @@ void work(CString filename, bool encryption)
 		fillJpegHeaderWithZero(filename.GetString());
 		hideFile(filename.GetString());
 	}
-	delete time;
+	delete[] time;
 }
 
 void hideFile(LPCWSTR filename)

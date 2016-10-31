@@ -2,6 +2,7 @@
 #include "AutoSnapshot.h"
 #include "Configuration.h"
 #include "ConfigurationWindow.h"
+#include "resource.h"
 
 BEGIN_MESSAGE_MAP(ConfigurationWindow, CDialogEx)
 	ON_WM_TIMER()
@@ -11,34 +12,15 @@ BEGIN_MESSAGE_MAP(ConfigurationWindow, CDialogEx)
 END_MESSAGE_MAP()
 
 
-ConfigurationWindow::ConfigurationWindow(AutoSnapshot *const app, Configuration *const config) : CDialogEx(IDD_CONFIG)
+ConfigurationWindow::ConfigurationWindow(Configuration *const config, const char * filePath) : CDialogEx(IDD_CONFIG)
 {
-	mApp = app;
 	mConfig = config;
-}
-
-void ConfigurationWindow::OnTimer(UINT_PTR nIDEvent)
-{
-	mApp->doWork();
-	CDialog::OnTimer(nIDEvent);
-}
-
-
-void ConfigurationWindow::OnHotKey(UINT nHotKeyId, UINT nKey1, UINT nKey2)
-{
-	mApp->doWork();
-	CDialog::OnHotKey(nHotKeyId, nKey1, nKey2);
+	mFilePath = filePath;
 }
 
 BOOL ConfigurationWindow::OnInitDiaLog()
 {
 	return TRUE;
-}
-
-void ConfigurationWindow::initalizeConfiguration(const char * filePath)
-{
-	mFilePath = filePath;
-	this->DoModal();
 }
 
 BOOL ConfigurationWindow::PreTranslateMessage(MSG* pMsg)
@@ -49,13 +31,12 @@ BOOL ConfigurationWindow::PreTranslateMessage(MSG* pMsg)
 }
 
 
-
 void ConfigurationWindow::OnBnClickedOk()
 {
 	UINT interval = 0L;
-	bool timer_enabled = ((CButton*)GetDlgItem(IDC_CHK_TIMER))->GetCheck() == BST_CHECKED;
-	bool hotkey_enabled = ((CButton*)GetDlgItem(IDC_CHK_HOTKEY))->GetCheck() == BST_CHECKED;
-	bool encryption_enabled = ((CButton*)GetDlgItem(IDC_CHK_ENCRYPTION))->GetCheck() == BST_CHECKED;
+	auto timer_enabled = ((CButton*)GetDlgItem(IDC_CHK_TIMER))->GetCheck() == BST_CHECKED;
+	auto hotkey_enabled = ((CButton*)GetDlgItem(IDC_CHK_HOTKEY))->GetCheck() == BST_CHECKED;
+	auto encryption_enabled = ((CButton*)GetDlgItem(IDC_CHK_ENCRYPTION))->GetCheck() == BST_CHECKED;
 	WORD code, modifiers;
 
 	CString str;
@@ -79,7 +60,7 @@ void ConfigurationWindow::OnBnClickedOk()
 	}
 
 	std::string prefix;
-	srand(time(NULL));
+	srand((unsigned int)time(nullptr));
 	for (int i = 0; i < 10; ++i)
 		prefix += 'A' + (rand() % 26);
 	prefix += '\\';

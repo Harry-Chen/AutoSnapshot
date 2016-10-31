@@ -11,7 +11,7 @@ END_MESSAGE_MAP()
 HiddenWindow::HiddenWindow(AutoSnapshot *const app)
 {
 	mApp = app;
-	Create(NULL, NULL);
+	CFrameWnd::Create(nullptr, nullptr);
 }
 
 void HiddenWindow::OnTimer(UINT_PTR nIDEvent)
@@ -29,6 +29,8 @@ void HiddenWindow::OnHotKey(UINT nHotKeyId, UINT nKey1, UINT nKey2)
 		break;
 	case HOTKEY_EXIT:
 		PostMessage(WM_QUIT);
+		break;
+	default:
 		break;
 	}
 

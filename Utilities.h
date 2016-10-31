@@ -3,7 +3,9 @@
 
 int GetEncoderClsid(const WCHAR* format, CLSID* pClsid);
 
-void BitmapToJpg(HBITMAP hbmpImage, int width, int height, LPCWSTR filename, ULONG uQuality);
+bool isBitmapIdentical(Gdiplus::Bitmap *a, Gdiplus::Bitmap *b);
+
+bool BitmapToJpg(HBITMAP hbmpImage, int width, int height, LPCWSTR filename, ULONG uQuality);
 
 void getDirectoryPath(CString &strCurPath);
 
